@@ -9,7 +9,7 @@
 // #define MATRIX_SIZE	10
 // #define MATRIX_SIZE	12
 // #define S_DIM	20
-#define MATRIX_SIZE 20
+#define MATRIX_SIZE 6
 #define NUM_THREADS 4
 
 
@@ -39,13 +39,13 @@ int *A, *B, *C;
 // } thread_data_t;
 
 typedef struct {
-    int start;
-    int end;
+    int start; // too many x y i j k l m n o p q r s t u v w named variables confuse me
+    int end;   // so i changed them to start and end
 } thread_data_t;
 
 void* thread_func(void* arg){
-    thread_data_t* data = (thread_data_t*)arg;
-    for(int i= data->start;i<data->end;i++){
+    thread_data_t* data = (thread_data_t*)arg; //cast the argument to the correct data type
+    for(int i= data->start;i<data->end;i++){   //loop through the cells taking into account the start and end values
         int row = i / MATRIX_SIZE;
         int col = i % MATRIX_SIZE;
         int result = 0;
@@ -54,6 +54,7 @@ void* thread_func(void* arg){
         }
         C[MATINDEX(row,col,MATRIX_SIZE)] = result;
     }
+    return NULL;
 }
 
 // // Funktion, welche von den Threads ausgeführt wird
@@ -115,9 +116,9 @@ void printMatrix(int* mat, int x, int y) {
 
 int main() {
 	// Alloziere Speicher für die Matrizen
-    int A = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
-    int B = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
-    int C = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
+    A = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
+    B = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
+    C = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
 
     
     int totalCells = MATRIX_SIZE * MATRIX_SIZE;
@@ -144,6 +145,18 @@ int main() {
 	// for (int i = 0; i < 20*12; i++) {
 	// 	B[i] = rand() % 10;
 	// }
+
+    //matrix a
+    for (int i=0; i<MATRIX_SIZE*MATRIX_SIZE; i++){
+        A[i] = rand() % 10 +1;
+    }
+    //matrix b
+    for (int i=0; i<MATRIX_SIZE*MATRIX_SIZE; i++){
+        B[i] = rand() % 10+1;
+    }
+    
+
+
 
 	// // Definiere Thread-Handles und Thread-Eingabedaten
 	// thread_data_t threadData[MATRIX_SIZE*MATRIX_SIZE];
