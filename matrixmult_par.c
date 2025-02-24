@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <time.h>
+#include <stdint.h>
+
 
 // Die Dimensionen sind zwar fix am Übungszettel vorgegeben,
 // aber prinzipiell sollte man sie trotzdem im Programm nicht hart-coden.
@@ -11,6 +14,7 @@
 // #define S_DIM	20
 #define MATRIX_SIZE 6
 #define NUM_THREADS 4
+#define TASKS_PER_THREAD 9
 
 
 
@@ -19,6 +23,14 @@
 // y .. y-Index (Anzahl der Spalten)
 // s .. Größe der y-Dimension (Max. Anzahl der Spalten)
 #define MATINDEX(x,y,s)		((x)*(s)+(y))
+
+// need a timer function, using the one from algo class with mr Corradini
+uint64_t timestamp(){
+	struct timespec tp;
+	clock_gettime(CLOCK_MONOTONIC, &tp);
+	return ((uint64_t)tp.tv_sec)*1000000000 + tp.tv_nsec;
+}
+
 
 // Die Matrizen A, B und C
 // Diese als globale Variablen zu definieren, macht es für die Threads einfacher, darauf zuzugreifen
@@ -46,8 +58,8 @@ typedef struct {
 void* thread_func(void* arg){
     thread_data_t* data = (thread_data_t*)arg; //cast the argument to the correct data type
     for(int i= data->start;i<data->end;i++){   //loop through the cells taking into account the start and end values
-        int row = i / MATRIX_SIZE;
-        int col = i % MATRIX_SIZE;
+        int row = i / MATRIX_SIZE; //calculate the row
+        int col = i % MATRIX_SIZE; //calculate the column by taking the remainder of the division
         int result = 0;
         for(int j = 0; j < MATRIX_SIZE; j++){
             result += A[MATINDEX(row,j,MATRIX_SIZE)] * B[MATINDEX(j,col,MATRIX_SIZE)];
@@ -120,7 +132,15 @@ int main() {
     B = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
     C = malloc(sizeof(int)*MATRIX_SIZE*MATRIX_SIZE);
 
-    
+    for (int i=0; i<MATRIX_SIZE*MATRIX_SIZE; i++){
+		A[i] = rand () % 10 + 1;
+		B[i] = rand () % 10 + 1;
+	}
+
+		uint16_t start_parallel = timestamp();
+
+
+
     int totalCells = MATRIX_SIZE * MATRIX_SIZE;
     int cellsPerThread = totalCells / NUM_THREADS;
     int remainder = totalCells % NUM_THREADS;
@@ -146,14 +166,24 @@ int main() {
 	// 	B[i] = rand() % 10;
 	// }
 
-    //matrix a
-    for (int i=0; i<MATRIX_SIZE*MATRIX_SIZE; i++){
-        A[i] = rand() % 10 +1;
-    }
-    //matrix b
-    for (int i=0; i<MATRIX_SIZE*MATRIX_SIZE; i++){
-        B[i] = rand() % 10+1;
-    }
+
+	for (int t = 0; t < NUM_THREADS; t++) {
+		pthread_join(threads[t], NULL);
+	}
+	uint16_t end_parallel = timestamp();
+	//printf("Parallel: %lu\n", end_parallel - start_parallel);
+	uint16_t time_parallel = end_parallel - start_parallel;
+    
+	printf("Parallel Matrix Multiplication Time: %u ns\n", time_parallel);
+	
+	// //matrix a
+    // for (int i=0; i<MATRIX_SIZE*MATRIX_SIZE; i++){
+    //     A[i] = rand() % 10 +1;
+    // }
+    // //matrix b
+    // for (int i=0; i<MATRIX_SIZE*MATRIX_SIZE; i++){
+    //     B[i] = rand() % 10+1;
+    // }
     
 
 
@@ -179,12 +209,16 @@ int main() {
 	// 	pthread_join(threads[i], NULL);
 	// }
 
-    for (int t = 0; t < NUM_THREADS; t++) {
-        pthread_join(threads[t], NULL);
-    }
+    // for (int t = 0; t < NUM_THREADS; t++) {
+    //     pthread_join(threads[t], NULL);
+    // }
     
 	// Gebe Ergebnis aus
 	printMatrix(C, MATRIX_SIZE, MATRIX_SIZE);
+
+	free(A);
+	free(B);
+	free(C);
 
 	return 0;
 }
