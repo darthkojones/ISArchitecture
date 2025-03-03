@@ -26,7 +26,7 @@
 #define  MATRIX_SIZE      125
 
 // How many threads should be used
-#define  THREAD_COUNT     4
+#define  THREAD_COUNT     1
 
 // The number of measurements used to calculate the average execution time
 #define  MEASUREMENTS     6
