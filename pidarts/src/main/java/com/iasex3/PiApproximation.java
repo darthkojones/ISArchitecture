@@ -10,11 +10,17 @@ import java.util.concurrent.TimeUnit;
 public class PiApproximation {
     private static final int TOTAL_DARTS = 1_000_000;
     // private static final int NUM_THREADS = 4; // hardcoded # of threads
-    private static final int RT_THREADS = 8;//Runtime.getRuntime().availableProcessors(); // # of threads available to JVM
+    private static final int RT_THREADS = Runtime.getRuntime().availableProcessors(); // # of threads available to JVM
     // private static final int DARTS_PER_THREAD = 16; // this is based on NUM_THREADS
     private static final int DARTS_PER_THREAD_RT = 40; //trial and error shows that 40 DPT is the sweet spot in terms of performance //10 * RT_THREADS; // this is based on RT_THREADS
-    private static final int NUM_IT = 10; // #iterations
+    private static final int NUM_IT = 11; // #iterations
     private static double AVG_TIME = 0; // keeps average execution time
+
+    /*
+     * I've noticed that the first iteration is always 10-15x slower than the rest.
+     * i think it's because of the jvm warmup - optimizations, thread init, class loading etc
+     * so i'm going to run the first iteration, then discard the results and run the rest & average them
+     */
 
     public static void main(String[] args) {
         System.out.println("RT_THREADS: " + RT_THREADS);
@@ -59,8 +65,14 @@ public class PiApproximation {
             double timeTaken = (endTime - startTime) / 1e9; // Convert nanoseconds to seconds
 
             // Add to total execution time for averaging
-            totalExecutionTime += timeTaken;
-            totalPiValue += piApprox;
+            // totalExecutionTime += timeTaken;
+            // totalPiValue += piApprox;
+            // start averaging from the second iteration
+            if (iter > 1) {
+                totalExecutionTime += timeTaken;
+                totalPiValue += piApprox;
+            }
+
 
             System.out.println("iteration " + iter + " - Pi approx: " + piApprox + ", time: " + timeTaken + " seconds");
 
@@ -76,8 +88,12 @@ public class PiApproximation {
         }
 
         // average time
-        AVG_TIME = totalExecutionTime / NUM_IT;
-        double avgPi = totalPiValue / NUM_IT;
+        // AVG_TIME = totalExecutionTime / NUM_IT;
+        // double avgPi = totalPiValue / NUM_IT;
+
+        // average time from the second iteration
+        AVG_TIME = totalExecutionTime / (NUM_IT - 1);
+        double avgPi = totalPiValue / (NUM_IT - 1);
 
         System.out.println("\nfinal results after " + NUM_IT + " iterations:");
         System.out.println("RT_THREADS: " + RT_THREADS);
