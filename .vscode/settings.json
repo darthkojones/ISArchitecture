@@ -112,5 +112,6 @@
     "thread": "cpp",
     "typeinfo": "cpp"
   },
-  "makefile.configureOnOpen": false
+  "makefile.configureOnOpen": false,
+  "java.project.sourcePaths": []
 }

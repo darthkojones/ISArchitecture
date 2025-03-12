@@ -3,6 +3,41 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Worker",
+      "request": "launch",
+      "mainClass": "ex4.Worker",
+      "projectName": "app"
+    },
+    {
+      "type": "java",
+      "name": "Coordinator",
+      "request": "launch",
+      "mainClass": "ex4.Coordinator",
+      "projectName": "app"
+    },
+    {
+      "type": "java",
+      "name": "Worker",
+      "request": "launch",
+      "mainClass": "ex4.Worker",
+      "projectName": "ISArchitecture_c6bea02c"
+    },
+    {
+      "type": "java",
+      "name": "Coordinator",
+      "request": "launch",
+      "mainClass": "main.java.ex4.Coordinator",
+      "projectName": ""
+    },
+    {
+      "type": "java",
+      "name": "Worker",
+      "request": "launch",
+      "mainClass": "i.like.turtles.Worker",
+      "projectName": ""
+    },
+    {
+      "type": "java",
       "name": "PiApproximation",
       "request": "launch",
       "mainClass": "com.iasex3.PiApproximation",
@@ -15,8 +50,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/darth/OneDrive/Documents/GitHub/ISArchitecture",
-      "program": "c:/Users/darth/OneDrive/Documents/GitHub/ISArchitecture/build/Debug/outDebug",
+      "cwd": "c:/Users/darth/OneDrive/Documents/GitHub/ISArchitecture/ex4/app/src/main/java",
+      "program": "c:/Users/darth/OneDrive/Documents/GitHub/ISArchitecture/ex4/app/src/main/java/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
