@@ -12,7 +12,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 public class Coordinator implements MqttCallback {
 
     private final MqttClient client;
-    private final long TOTAL_DARTS = 690_000;
+    private final long TOTAL_DARTS = 69_000;
     private final long DARTS_BATCH = 420;
 
     private long dartsLeft = TOTAL_DARTS;
