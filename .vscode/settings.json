@@ -113,5 +113,6 @@
     "typeinfo": "cpp"
   },
   "makefile.configureOnOpen": false,
-  "java.project.sourcePaths": []
+  "java.project.sourcePaths": [],
+  "java.debug.settings.onBuildFailureProceed": true
 }
