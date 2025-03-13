@@ -19,27 +19,29 @@ public class Coordinator implements MqttCallback {
     private long totalHits = 0;
     private long totalDartsThrown = 0;
     private boolean finished = false;
-    private final Set<String> activeWorkers = new HashSet<>();
+    // i wnna keep track of the # of workers 
+    private final Set<String> activeWorkers = new HashSet<>(); // we just need to keep track of the size
 
     public Coordinator(String broker) throws MqttException {
-        client = new MqttClient(broker, "Coordinator");
-        client.setCallback(this);
+        client = new MqttClient(broker, "Coordinator"); // sets up the broker with the coordinator as a client
+        client.setCallback(this); // for the mqtt events 
         client.connect();
         System.out.println("coordinator connected, let's fuckin' go!");
         System.out.println("total darts to throw today " + TOTAL_DARTS);
 
+        // this is what the coordinator is going to be on the lookout for 
         client.subscribe("mqtt/coordinator/requests/+");
         client.subscribe("mqtt/coordinator/results/+");
         System.out.println("subscribed to request & result topics. bring it workers!");
     }
 
     private long allocateDarts() {
-        if (dartsLeft >= DARTS_BATCH) {
-            dartsLeft -= DARTS_BATCH;
+        if (dartsLeft >= DARTS_BATCH) {  //if we have a full batch
+            dartsLeft -= DARTS_BATCH;    //take away a batch from darts left
             return DARTS_BATCH;
-        } else {
-            long remaining = dartsLeft;
-            dartsLeft = 0;
+        } else {                        //otherwise if there are not enough darts 4 a full batch
+            long remaining = dartsLeft; //we get the remaining number of darts
+            dartsLeft = 0;              //and set the darts to 0 
             System.out.println("last batch dudes! only " + remaining + " darts left");
             return remaining;
         }
@@ -53,11 +55,11 @@ public class Coordinator implements MqttCallback {
             Thread.sleep(300);
         }
 
-        double piApproximation = 4.0 * (double) totalHits / totalDartsThrown;
+        double piApprox = 4.0 * (double) totalHits / totalDartsThrown;
         long endTime = System.nanoTime();
-        double timeElapsed = (double) (endTime - startTime) / 1_000_000_000.0;
-        System.out.println("estimated pi: " + piApproximation);
-        System.out.println("finished in: " + timeElapsed + " seconds with " + activeWorkers.size() + " badass worker(s)!");
+        double timeElapsed = (double) (endTime - startTime) / 1_000_000_000.0; 
+        System.out.println("estimated pi: " + piApprox);
+        System.out.println("finished in: " + timeElapsed + " seconds with " + activeWorkers.size() + " badass worker(s)!"); //just need the size of the hashset for the # of workers
 
         Thread.sleep(3000);
         client.disconnect();
@@ -71,7 +73,8 @@ public class Coordinator implements MqttCallback {
         String workerId = topicParts[3];
 
         if (topic.contains("/requests/")) {
-            activeWorkers.add(workerId);
+            // need to add the worker to the hashset to keep track of it
+            activeWorkers.add(workerId); 
             long darts = allocateDarts();
             client.publish("mqtt/coordinator/worker/" + workerId, new MqttMessage(Long.toString(darts).getBytes()));
             System.out.println("sent " + darts + " darts to worker [" + workerId + "], we have "  + dartsLeft + " darts left to give out");
@@ -86,8 +89,8 @@ public class Coordinator implements MqttCallback {
 
             System.out.println("worker [" + workerId + "] scored " + hitsNow + " hits from " + dartsThrownNow + " darts");
 
-            if (totalDartsThrown >= TOTAL_DARTS) {
-                finished = true;
+            if (totalDartsThrown >= TOTAL_DARTS) { 
+                finished = true; // pack your bags, next stop Hollywood
                 System.out.println("we're done here boys, all darts thrown!");
                 notifyWorkersToStop();
             }
