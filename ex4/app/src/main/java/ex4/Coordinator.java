@@ -13,7 +13,7 @@ public class Coordinator implements MqttCallback {
 
     private final MqttClient client;
     private final long TOTAL_DARTS = 69_000;
-    private final long DARTS_BATCH = 420;
+    private final long DARTS_BATCH = 1420;
 
     private long dartsLeft = TOTAL_DARTS;
     private long totalHits = 0;
@@ -57,11 +57,12 @@ public class Coordinator implements MqttCallback {
 
         double piApprox = 4.0 * (double) totalHits / totalDartsThrown;
         long endTime = System.nanoTime();
-        double timeElapsed = (double) (endTime - startTime) / 1_000_000_000.0; 
+        double timeElapsed = (double) (endTime - startTime) / 1_000_000_000.0; //ONE BILLION DORRARS~!
         System.out.println("estimated pi: " + piApprox);
         System.out.println("finished in: " + timeElapsed + " seconds with " + activeWorkers.size() + " badass worker(s)!"); //just need the size of the hashset for the # of workers
 
         Thread.sleep(3000);
+        //disconnect n close the coordinator 
         client.disconnect();
         client.close();
         System.out.println("*peace out* coordinator out!");
@@ -69,8 +70,14 @@ public class Coordinator implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        String[] topicParts = topic.split("/");
-        String workerId = topicParts[3];
+        String[] topicParts = topic.split("/"); // regex still haunts me
+        // 4th index in the topicParts array that's split by "/" 
+        // client.subscribe("mqtt/coordinator/requests/+");
+        // 1st index topicParts[0] = "mqtt"
+        // 2nd index topicParts[1] = "coordinator"
+        // 3rd index topicParts[2] = "requests" or "results"
+        // 4th index topicParts[3] = "+"    aka workerId
+        String workerId = topicParts[3]; 
 
         if (topic.contains("/requests/")) {
             // need to add the worker to the hashset to keep track of it
